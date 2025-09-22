@@ -1,0 +1,624 @@
+# Save the updated HTML to a downloadable file so the user can open it locally.
+html_content = """<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Chatbot → Agente → Copiloto · Contaduría Pública</title>
+  <style>
+    :root{
+      --bg:#0b1224;
+      --panel:#0f172aee;
+      --ink:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22d3ee;
+      --accent2:#a78bfa;
+      --shadow:0 12px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --w:max(920px, 68vw);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; background: radial-gradient(1400px 900px at 80% -10%, #1f2937 0, transparent 60%),
+                                   radial-gradient(900px 700px at -20% 120%, #111827 0, transparent 60%), var(--bg);
+         color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;}
+
+    header#top{position:sticky; top:0; z-index:10; display:flex; align-items:center; gap:12px; padding:14px 18px; background:#0b1224cc; backdrop-filter: blur(6px); border-bottom:1px solid #ffffff12}
+    header#top h1{margin:0; font-size: clamp(18px, 2.6vw, 28px); font-weight:700; letter-spacing:.3px}
+    #btnFull,#btnIndex{padding:8px 12px; border-radius:10px; border:1px solid #ffffff2a; background:#0b1224; color:var(--ink); cursor:pointer}
+    #btnFull:hover,#btnIndex:hover{border-color:#ffffff55}
+    #progress{margin-left:auto; display:flex; align-items:center; gap:6px}
+    .dot{width:9px; height:9px; border-radius:999px; background:#ffffff33; border:1px solid #ffffff55}
+    .dot.active{background:linear-gradient(45deg, var(--accent), var(--accent2)); box-shadow: 0 0 0 4px #22d3ee22}
+
+    #wrap{display:grid; grid-template-columns: 280px 1fr; gap:14px; width: min(1200px, 95vw); margin: 14px auto 28px}
+    nav#toc{position:sticky; top:72px; align-self:start; background:#0b1224cc; border:1px solid #ffffff14; border-radius:14px; padding:12px; box-shadow:var(--shadow)}
+    nav#toc h2{margin:4px 8px 8px; font-size:13px; color:var(--muted); font-weight:600}
+    nav#toc ol{margin:0; padding:0; list-style:none; display:grid; gap:6px; max-height:70vh; overflow:auto}
+    nav#toc a{display:block; padding:8px 10px; border-radius:10px; color:var(--ink); text-decoration:none; border:1px solid transparent; font-size:14px}
+    nav#toc a:hover{background:#0b1224; border-color:#ffffff22}
+    nav#toc a.active{background:linear-gradient(90deg, #0b1224, transparent); border-color:#22d3ee55}
+
+    main#deck{position:relative; min-height:70vh}
+    .slide{background: linear-gradient(180deg, #0b1224cc, #0b122488); border:1px solid #ffffff14; border-radius:var(--radius); box-shadow:var(--shadow);
+           display:grid; grid-template-rows: 70px 1fr; overflow:hidden; margin-bottom:14px}
+    .slide header{display:flex; align-items:center; padding:14px 16px; background:linear-gradient(90deg, #0b1224aa, transparent); border-bottom:1px solid #ffffff12}
+    .slide header h2{margin:0; font-size: clamp(18px, 2.2vw, 26px)}
+    .content{padding:18px 20px 24px; overflow:auto}
+
+    .lead{font-size: clamp(16px, 1.3vw, 18px); color:#cbd5e1; margin:0 0 14px}
+    .bullets{margin:0; padding-left:18px; line-height:1.7}
+    .muted{color:var(--muted)}
+
+    table{width:100%; border-collapse:collapse}
+    th,td{padding:12px 10px; border-bottom:1px dashed #ffffff20; vertical-align:top}
+    thead th{position:sticky; top:0; background:#0b1224ee}
+
+    .grid{display:grid; gap:12px}
+    .g2{grid-template-columns: repeat(2, 1fr)}
+    .g3{grid-template-columns: repeat(3, 1fr)}
+    .card{background:#0b1224bb; border:1px solid #ffffff14; border-radius:14px; padding:14px}
+    .card h3{margin:0 0 6px; font-size: clamp(15px, 1.4vw, 20px); color:#93c5fd}
+    .tag{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #ffffff22; color:#a5b4fc; font-size:12px}
+
+    .timeline{position:relative; padding-left:20px}
+    .timeline:before{content:\"\"; position:absolute; left:7px; top:0; bottom:0; width:2px; background:#334155}
+    .timeline .t{position:relative; margin:10px 0 14px}
+    .timeline .t:before{content:\"\"; position:absolute; left:-14px; top:6px; width:10px; height:10px; border-radius:50%; background:linear-gradient(45deg,var(--accent),var(--accent2))}
+
+    /* Video wall */
+    .video-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px}
+    .video-card{background:#0b1224bb; border:1px solid #ffffff14; border-radius:14px; padding:10px}
+    .video-card h4{margin:8px 6px; font-weight:600; font-size:14px; color:#c7d2fe}
+    .video-card iframe{width:100%; aspect-ratio:9/16; border:0; border-radius:12px; box-shadow:var(--shadow)}
+
+    footer.page{padding:10px 18px; color:#muted; text-align:center}
+
+    @media (max-width: 980px){
+      #wrap{grid-template-columns: 1fr}
+      nav#toc{position:relative; top:auto}
+      .video-grid{grid-template-columns:1fr}
+    }
+
+    @media print{
+      body{background:#fff; color:#000}
+      header#top, nav#toc, #progress{display:none}
+      .slide{box-shadow:none; border:0; page-break-inside:avoid}
+      .content{overflow:visible}
+      footer.page{color:#444}
+      .video-card iframe{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header id="top">
+    <h1>Chatbot → Agente → Copiloto · Contaduría Pública</h1>
+    <button id="btnIndex" aria-controls="toc" aria-expanded="true">Índice</button>
+    <button id="btnFull">Pantalla completa (F)</button>
+    <div id="progress" aria-label="Progreso"></div>
+  </header>
+
+  <div id="wrap">
+    <nav id="toc" aria-label="Índice de secciones">
+      <h2>Secciones</h2>
+      <ol id="tocList"></ol>
+    </nav>
+
+    <main id="deck" tabindex="0">
+
+      <!-- 01 Portada -->
+      <section class="slide" id="s-01" aria-labelledby="t-01">
+        <header><h2 id="t-01">Portada</h2></header>
+        <div class="content">
+          <p class="lead"><strong>Chatbots contables y más allá</strong>: de la conversación a la colaboración estratégica.</p>
+          <div class="grid g2">
+            <div class="card">
+              <h3>Datos de la ponencia</h3>
+              <ul class="bullets">
+                <li>Autor: <strong>Dr. José R. Chávez Mejía</strong> — CUNOC–USAC</li>
+                <li>Sede: Universidad Autónoma de Chiapas (UNACH)</li>
+                <li>Duración: 60 minutos</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Objetivo</h3>
+              <p>Explicar la evolución <em>Chatbot → Agente → Copiloto</em> y su impacto en la contaduría pública, con aplicaciones y buenas prácticas.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 02 Agenda -->
+      <section class="slide" id="s-02" aria-labelledby="t-02">
+        <header><h2 id="t-02">Agenda</h2></header>
+        <div class="content">
+          <ol class="bullets">
+            <li>Contexto y motivación</li>
+            <li>Definiciones: Chatbot, Agente, Copiloto</li>
+            <li>Comparativa y arquitecturas</li>
+            <li>Tipos de instrucciones y ejemplos contables</li>
+            <li>Aplicaciones actuales y casos</li>
+            <li>Riesgos, ética y KPIs</li>
+            <li>Roadmap, demo y cierre</li>
+            <li>Material complementario</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 03 Material de estudio (actualizado) -->
+      <section class="slide" id="s-material" aria-labelledby="t-material">
+        <header><h2 id="t-material">Material complementario</h2></header>
+        <div class="content grid g2">
+          <div class="card">
+            <h3>Lecturas</h3>
+            <p>Accede al material de estudio preparado en <strong>NotebookLM</strong> con resúmenes y documentos base:</p>
+            <p><a href="https://notebooklm.google.com/notebook/5f238fcd-0206-447d-939d-8785ff872af6" target="_blank" rel="noopener">📘 Enlace al NotebookLM</a></p>
+            <p class="muted">(Se abre en una pestaña nueva)</p>
+          </div>
+          <div class="card">
+            <h3>Actividad interactiva</h3>
+            <p>Accede a la dinámica en <strong>Curipod</strong> para participar durante el simposio:</p>
+            <p><a href="https://curipod.com/6e768639-0c4a-4d2a-89d5-2c391c3bb543/lessons/7e87092c-f7ab-45fa-9819-f66a9ed912d1/edit" target="_blank" rel="noopener">🎮 Abrir Curipod (actividad en vivo)</a></p>
+            <p class="muted">(Se abre en una pestaña nueva)</p>
+          </div>
+          <div class="card">
+            <h3>Videos (≤ 3 min · embebidos)</h3>
+            <div class="video-grid" aria-label="Tres videos cortos explicativos">
+              <div class="video-card">
+                <h4>¿Qué es un Chatbot? (Short)</h4>
+                <iframe title="¿Qué es un Chatbot?" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+                  src="https://www.youtube.com/embed/GO1hkxhgWy0?rel=0&modestbranding=1"></iframe>
+              </div>
+              <div class="video-card">
+                <h4>¿Qué es un Agente de IA? (Short)</h4>
+                <iframe title="¿Qué es un Agente de IA?" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+                  src="https://www.youtube.com/embed/OQqgY4jOCBM?rel=0&modestbranding=1"></iframe>
+              </div>
+              <div class="video-card">
+                <h4>Introducción a Copilot (Short)</h4>
+                <iframe title="Introducción a Copilot" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
+                  src="https://www.youtube.com/embed/uX9OFpvBgqY?rel=0&modestbranding=1"></iframe>
+              </div>
+            </div>
+            <p class="muted">Consejo: presiona “F” para pantalla completa y luego reproduce cada video.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 04 Contexto -->
+      <section class="slide" id="s-03" aria-labelledby="t-03">
+        <header><h2 id="t-03">Contexto</h2></header>
+        <div class="content">
+          <p class="lead">La IA está cambiando el trabajo contable: más datos, más velocidad, más control.</p>
+          <ul class="bullets">
+            <li>Automatización de tareas repetitivas y atención 24/7.</li>
+            <li>De preguntas puntuales a flujos orquestados y análisis proactivo.</li>
+            <li>La responsabilidad y el juicio profesional siguen siendo centrales.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 05 Definición Chatbot -->
+      <section class="slide" id="s-04" aria-labelledby="t-04" data-kind="chatbot">
+        <header><h2 id="t-04">Definición · Chatbot</h2></header>
+        <div class="content">
+          <p class="lead">Sistema <strong>reactivo</strong> de conversación: responde <em>prompts</em> simples dentro de un alcance limitado.</p>
+          <div class="grid g2">
+            <div class="card">
+              <h3>Características</h3>
+              <ul class="bullets">
+                <li>Guiones/reglas o LLM básico.</li>
+                <li>Sin autonomía ni herramientas externas.</li>
+                <li>Memoria limitada a la sesión.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Ejemplos contables</h3>
+              <ul class="bullets">
+                <li>FAQ tributarias: tasas, plazos, formularios.</li>
+                <li>Definiciones: activo corriente, depreciación.</li>
+                <li>Cálculos puntuales: IVA de Q1,000 al 12%.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 06 Definición Agente -->
+      <section class="slide" id="s-05" aria-labelledby="t-05" data-kind="agente">
+        <header><h2 id="t-05">Definición · Agente</h2></header>
+        <div class="content">
+          <p class="lead">Sistema <strong>autónomo</strong> orientado a objetivos con bucle <em>Percepción → Decisión → Acción</em>.</p>
+          <div class="grid g2">
+            <div class="card">
+              <h3>Capacidades</h3>
+              <ul class="bullets">
+                <li>Planifica pasos y ejecuta tareas complejas.</li>
+                <li>Usa herramientas/APIs y memoria operativa.</li>
+                <li>Actúa proactivamente con supervisión.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Ejemplos contables</h3>
+              <ul class="bullets">
+                <li>Cierre mensual de finanzas (de punta a punta).</li>
+                <li>Detección automática de anomalías/fraude.</li>
+                <li>Generación y envío de reportes internos.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 07 Definición Copiloto -->
+      <section class="slide" id="s-06" aria-labelledby="t-06" data-kind="copiloto">
+        <header><h2 id="t-06">Definición · Copiloto</h2></header>
+        <div class="content">
+          <p class="lead">Asistente <strong>colaborativo</strong> integrado en la herramienta: sugiere, anticipa y el humano decide.</p>
+          <div class="grid g2">
+            <div class="card">
+              <h3>Diferenciales</h3>
+              <ul class="bullets">
+                <li>Contexto in-app + generación de contenido.</li>
+                <li>Recomendaciones y alertas proactivas.</li>
+                <li>Flujos semi-automáticos con validación.</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h3>Ejemplos contables</h3>
+              <ul class="bullets">
+                <li>Borradores de informes y narrativas financieras.</li>
+                <li>Conciliaciones y sugerencias de asientos.</li>
+                <li>KPIs y análisis de variaciones al instante.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 08 Comparativa -->
+      <section class="slide" id="s-07" aria-labelledby="t-07">
+        <header><h2 id="t-07">Comparativa central</h2></header>
+        <div class="content">
+          <table>
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>Chatbot</th>
+                <th>Agente</th>
+                <th>Copiloto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Tipo de instrucción</strong></td>
+                <td>Directa/cerrada</td>
+                <td>Orientada a objetivos (multipaso)</td>
+                <td>Estratégica/colaborativa</td>
+              </tr>
+              <tr>
+                <td><strong>Memoria</strong></td>
+                <td>Sesión</td>
+                <td>Histórico operativo</td>
+                <td>Contexto de negocio</td>
+              </tr>
+              <tr>
+                <td><strong>Herramientas</strong></td>
+                <td>No</td>
+                <td>APIs, BD, archivos</td>
+                <td>Integrado a la app</td>
+              </tr>
+              <tr>
+                <td><strong>Autonomía</strong></td>
+                <td>Reactivo</td>
+                <td>Proactivo (supervisado)</td>
+                <td>Asistivo (humano decide)</td>
+              </tr>
+              <tr>
+                <td><strong>Ejemplo contable</strong></td>
+                <td>“¿Tasa del IVA?”</td>
+                <td>“Cierre mensual completo”</td>
+                <td>“Señala riesgos y propone ajustes”</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 09 Evolución -->
+      <section class="slide" id="s-08" aria-labelledby="t-08">
+        <header><h2 id="t-08">Evolución histórica</h2></header>
+        <div class="content timeline">
+          <div class="t"><strong>1960s · ELIZA</strong> — Primer chatbot por patrones; ilusión de comprensión.</div>
+          <div class="t"><strong>2010s · Asistentes</strong> — Reglas + voz (Siri/Alexa); comandos específicos.</div>
+          <div class="t"><strong>2022+ · LLM</strong> — Chatbots generativos (Q&A abierto, mejor lenguaje).</div>
+          <div class="t"><strong>2023+ · Copilotos</strong> — IA integrada en apps; sugerencias y alertas.</div>
+          <div class="t"><strong>2024–25 · Agentes</strong> — Autonomía con objetivos, herramientas y planificación.</div>
+        </div>
+      </section>
+
+      <!-- 10 Arquitecturas -->
+      <section class="slide" id="s-09" aria-labelledby="t-09">
+        <header><h2 id="t-09">Arquitecturas</h2></header>
+        <div class="content grid g3">
+          <div class="card">
+            <h3>Chatbot</h3>
+            <p class="muted">Entrada → NLP/Reglas → Respuesta/FAQ</p>
+            <ul class="bullets">
+              <li>Base de conocimiento</li>
+              <li>Flujo Q&A</li>
+              <li>Sin herramientas externas</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Copiloto</h3>
+            <p class="muted">LLM + Contexto de app + Herramientas</p>
+            <ul class="bullets">
+              <li>Memoria de trabajo contextual</li>
+              <li>Invoca APIs/funciones con permiso</li>
+              <li>UI con sugerencias inline</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Agente</h3>
+            <p class="muted">Percepción → Decisión → Acción (bucle)</p>
+            <ul class="bullets">
+              <li>Sensores/conectores a datos</li>
+              <li>Planner (razonamiento multipaso)</li>
+              <li>Actuadores (APIs, RPA, mensajes)</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11 Tipos de instrucciones -->
+      <section class="slide" id="s-10" aria-labelledby="t-10">
+        <header><h2 id="t-10">Tipos de instrucciones</h2></header>
+        <div class="content grid g3">
+          <div class="card">
+            <h3>Chatbot</h3>
+            <ul class="bullets">
+              <li>“¿Cuál es la tasa del IVA?”</li>
+              <li>“Define <em>activo corriente</em> en 2 líneas.”</li>
+              <li>“IVA de Q1,000 al 12%.”</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Agente</h3>
+            <ul class="bullets">
+              <li>“Compila facturas de septiembre y calcula IVA total.”</li>
+              <li>“Revisa asientos del trimestre y detecta inconsistencias.”</li>
+              <li>“Genera un Excel con razones de liquidez.”</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Copiloto</h3>
+            <ul class="bullets">
+              <li>“Analiza estados 2024 y advierte riesgos.”</li>
+              <li>“Sugiere estrategias fiscales legales.”</li>
+              <li>“Monitorea gastos inusuales y alerta.”</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12 Aplicaciones -->
+      <section class="slide" id="s-11" aria-labelledby="t-11">
+        <header><h2 id="t-11">Aplicaciones actuales</h2></header>
+        <div class="content grid g2">
+          <div class="card">
+            <h3>Tributación</h3>
+            <ul class="bullets">
+              <li>Asistente de declaraciones y calendarios.</li>
+              <li>Validación de reglas y alertas de cambios.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Auditoría</h3>
+            <ul class="bullets">
+              <li>Analítica de transacciones y outliers.</li>
+              <li>Lectura de contratos y extracción de riesgos.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Finanzas</h3>
+            <ul class="bullets">
+              <li>Cierre mensual asistido y narrativas.</li>
+              <li>Proyecciones y KPIs en tiempo real.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Docencia</h3>
+            <ul class="bullets">
+              <li>Tutor de normas y ejercicios guiados.</li>
+              <li>Simulaciones con agentes (rol de cliente).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13 Patrones de uso -->
+      <section class="slide" id="s-12" aria-labelledby="t-12">
+        <header><h2 id="t-12">Patrones de uso</h2></header>
+        <div class="content grid g3">
+          <div class="card"><span class="tag">Recepción</span>
+            <h3>Chatbot</h3>
+            <p class="muted">Primera línea: FAQ, filtros, orientación.</p>
+          </div>
+          <div class="card"><span class="tag">Ejecución</span>
+            <h3>Agente</h3>
+            <p class="muted">Orquesta tareas con herramientas y datos.</p>
+          </div>
+          <div class="card"><span class="tag">Análisis</span>
+            <h3>Copiloto</h3>
+            <p class="muted">Insights, recomendaciones y validación humana.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14 Riesgos -->
+      <section class="slide" id="s-13" aria-labelledby="t-13">
+        <header><h2 id="t-13">Riesgos y mitigaciones</h2></header>
+        <div class="content grid g2">
+          <div class="card">
+            <h3>Riesgos</h3>
+            <ul class="bullets">
+              <li>Alucinaciones y errores contextuales.</li>
+              <li>Exposición de datos sensibles.</li>
+              <li>Desactualización de normativa.</li>
+              <li>Dependencia excesiva del sistema.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Mitigaciones</h3>
+            <ul class="bullets">
+              <li>Base verificada + citación de fuentes.</li>
+              <li>Gobernanza de datos y anonimización.</li>
+              <li>Calendario de revisión y responsables.</li>
+              <li>Humano en el loop y límites de acción.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 15 Ética -->
+      <section class="slide" id="s-14" aria-labelledby="t-14">
+        <header><h2 id="t-14">Ética y responsabilidad</h2></header>
+        <div class="content">
+          <ul class="bullets">
+            <li>Transparencia: el usuario sabe cuándo habla con IA.</li>
+            <li>Responsabilidad profesional: el contador firma y responde.</li>
+            <li>Cumplimiento: protección de datos y propiedad intelectual.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- 16 KPIs -->
+      <section class="slide" id="s-15" aria-labelledby="t-15">
+        <header><h2 id="t-15">KPIs de éxito</h2></header>
+        <div class="content grid g2">
+          <div class="card">
+            <h3>Métricas de servicio</h3>
+            <ul class="bullets">
+              <li>Resolución en primer intento (FTR).</li>
+              <li>Tiempo medio de respuesta.</li>
+              <li>CSAT/NPS post-interacción.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Métricas de valor</h3>
+            <ul class="bullets">
+              <li>% escalamiento a humano.</li>
+              <li>Cobertura del temario/base.</li>
+              <li>Horas ahorradas/mes por proceso.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- 17 Roadmap -->
+      <section class="slide" id="s-16" aria-labelledby="t-16">
+        <header><h2 id="t-16">Roadmap (6 semanas)</h2></header>
+        <div class="content">
+          <ol class="bullets">
+            <li><strong>1–2</strong>: Alcance, fuentes, FAQs, estilo de respuesta.</li>
+            <li><strong>3–4</strong>: Prototipo, pruebas internas, ajustes.</li>
+            <li><strong>5</strong>: Piloto (10–20 usuarios), métricas.</li>
+            <li><strong>6</strong>: Despliegue controlado + plan de mejoras.</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 18 Demo -->
+      <section class="slide" id="s-17" aria-labelledby="t-17">
+        <header><h2 id="t-17">Demostración guiada (opcional)</h2></header>
+        <div class="content grid g3">
+          <div class="card">
+            <h3>Preguntas reales</h3>
+            <ul class="bullets">
+              <li>“¿Cuál es el vencimiento del ISR trimestral?”</li>
+              <li>“Resume variaciones del EERR respecto a 2024.”</li>
+              <li>“Genera checklist de auditoría de inventarios.”</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3>Fallo controlado</h3>
+            <p class="muted">Cómo responde el sistema ante algo fuera de base y cómo escala a humano.</p>
+          </div>
+          <div class="card">
+            <h3>Mejora continua</h3>
+            <p class="muted">Registro de logs, análisis de gaps y actualización de la base.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 19 Cierre -->
+      <section class="slide" id="s-18" aria-labelledby="t-18">
+        <header><h2 id="t-18">Cierre y preguntas</h2></header>
+        <div class="content">
+          <p class="lead"><strong>Idea fuerza:</strong> “La IA no reemplaza al contador: multiplica su alcance y eleva su rol estratégico.”</p>
+          <ul class="bullets">
+            <li>Usar cada nivel en su contexto adecuado.</li>
+            <li>Gobernanza, ética y métricas desde el inicio.</li>
+            <li>Formación continua en IA aplicada.</li>
+          </ul>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <footer class="page">Usa ← → para navegar · Tecla <strong>F</strong> pantalla completa · © 2025 · Dr. José R. Chávez Mejía · CUNOC–USAC</footer>
+
+  <script>
+    // Construcción dinámica de TOC y progreso
+    const slides = [...document.querySelectorAll('.slide')];
+    const toc = document.getElementById('tocList');
+    const progress = document.getElementById('progress');
+    slides.forEach((s, idx)=>{
+      const a = document.createElement('a');
+      a.href = `#${s.id}`; a.textContent = `${String(idx+1).padStart(2,'0')} · ${s.querySelector('h2').textContent}`;
+      const li = document.createElement('li'); li.appendChild(a); toc.appendChild(li);
+      const dot = document.createElement('div'); dot.className = 'dot'; progress.appendChild(dot);
+    });
+
+    const dots = [...progress.querySelectorAll('.dot')];
+    const tocLinks = [...toc.querySelectorAll('a')];
+
+    function updateActive(){
+      const y = window.scrollY + 120; // header offset
+      let active = 0;
+      slides.forEach((s,i)=>{ if(s.offsetTop <= y) active = i; });
+      dots.forEach((d,i)=> d.classList.toggle('active', i===active));
+      tocLinks.forEach((l,i)=> l.classList.toggle('active', i===active));
+      document.title = slides[active].querySelector('h2').textContent + ' · Chatbot→Agente→Copiloto';
+    }
+    window.addEventListener('scroll', updateActive);
+    updateActive();
+
+    function goto(idx){ idx=Math.max(0, Math.min(idx, slides.length-1)); slides[idx].scrollIntoView({behavior:'smooth', block:'start'}); }
+    addEventListener('keydown', (e)=>{
+      const y = window.scrollY; const tops = slides.map(s=>s.offsetTop);
+      let i = tops.findIndex(t=> t - 10 > y) - 1; if(i<0) i = tops.filter(t=>t<=y).length - 1; if(i<0) i=0;
+      if(e.key==='ArrowRight') goto(i+1);
+      if(e.key==='ArrowLeft') goto(i-1);
+      if(e.key.toLowerCase()==='f') toggleFull();
+      if(e.key.toLowerCase()==='i') toggleIndex();
+    });
+
+    function toggleFull(){ const el=document.documentElement; !document.fullscreenElement? el.requestFullscreen?.(): document.exitFullscreen?.(); }
+    document.getElementById('btnFull').addEventListener('click', toggleFull);
+
+    function toggleIndex(){ const toc=document.getElementById('toc'); const btn=document.getElementById('btnIndex');
+      const open = toc.style.display!== 'none'; toc.style.display = open? 'none':'block'; btn.setAttribute('aria-expanded', String(!open)); }
+    document.getElementById('btnIndex').addEventListener('click', toggleIndex);
+
+    dots[0]?.classList.add('active'); tocLinks[0]?.classList.add('active');
+  </script>
+</body>
+</html>
+"""
+with open("/mnt/data/simposio_chatbot_agente_copiloto.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+"/mnt/data/simposio_chatbot_agente_copiloto.html"

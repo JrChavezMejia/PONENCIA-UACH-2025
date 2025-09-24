@@ -1,4 +1,5 @@
-<!doctype html>
+# Re-create the HTML file with the corrected YouTube embed URL
+html_content = """<!doctype html>
 <html lang="es">
 <head>
   <meta charset="utf-8" />
@@ -61,9 +62,9 @@
     .tag{display:inline-block; padding:4px 8px; border-radius:999px; border:1px solid #ffffff22; color:#a5b4fc; font-size:12px}
 
     .timeline{position:relative; padding-left:20px}
-    .timeline:before{content:\"\"; position:absolute; left:7px; top:0; bottom:0; width:2px; background:#334155}
+    .timeline:before{content:""; position:absolute; left:7px; top:0; bottom:0; width:2px; background:#334155}
     .timeline .t{position:relative; margin:10px 0 14px}
-    .timeline .t:before{content:\"\"; position:absolute; left:-14px; top:6px; width:10px; height:10px; border-radius:50%; background:linear-gradient(45deg,var(--accent),var(--accent2))}
+    .timeline .t:before{content:""; position:absolute; left:-14px; top:6px; width:10px; height:10px; border-radius:50%; background:linear-gradient(45deg,var(--accent),var(--accent2))}
 
     /* Video wall */
     .video-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px}
@@ -176,7 +177,7 @@
               <div class="video-card">
                 <h4>Introducción a Copilotos de IA (Short)</h4>
                 <iframe title="Introducción a Copilotos de IA" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen
-                  src="https://www.youtube.com/shorts/5-RpsnTLsbc"></iframe>
+                  src="https://www.youtube.com/embed/5-RpsnTLsbc?rel=0&modestbranding=1"></iframe>
               </div>
             </div>
             <p class="muted">Consejo: presiona “F” para pantalla completa y luego reproduce cada video.</p>
@@ -617,7 +618,7 @@
 </body>
 </html>
 """
-with open("/mnt/data/simposio_chatbot_agente_copiloto.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-"/mnt/data/simposio_chatbot_agente_copiloto.html"
+from pathlib import Path
+out_path = Path("/mnt/data/simposio_chatbot_agente_copiloto.html")
+out_path.write_text(html_content, encoding="utf-8")
+print("Saved to:", out_path)
